@@ -37,8 +37,8 @@ like `username.github.io/repo/`. Then:
 | --- | --- |
 | **Today** | Calorie and protein rings, carbs and fat totals, a grid of your foods and meals. **Tap = log 1 serving**; long-press (or the small **±**) to choose ½, 1½, 2…. Includes **Quick add** for one-off items, with an option to save them. Tap a logged entry to change its servings, or **×** to remove it (with Undo). |
 | **What fits** | Remaining calories and protein, the **top 3 combos** of 2–3 items, and every single item that fits, each with a one-tap *Log it*. |
-| **My Foods** | Add, edit or delete foods and meals. Meals are bundles of foods with quantities, and their totals always come from the current foods. |
-| **History** | Past days with totals (tap a day to see its entries), plus a 7-day average. |
+| **My Foods** | Add and edit foods and meals. Tap the trash icon to delete one (with Undo). Meals are bundles of foods with quantities, and their totals always come from the current foods. |
+| **History** | Past days with totals, plus a 7-day average. Tap a day to see its entries, where you can fix servings or remove an entry. |
 | **Settings** | Goals, goal type (*Stay under* for cutting, *Reach at least* for bulking), which macros to track, JSON export/import, and erase all data. |
 
 A new day starts automatically at local midnight. Past days are kept.

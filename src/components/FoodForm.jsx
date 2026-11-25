@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Sheet, Button, ConfirmButton, Field, TextInput, NumberInput } from './ui.jsx'
 import { validateFields } from '../lib/validate.js'
 import { useStore } from '../state/store.jsx'
+import { useToast } from './Toast.jsx'
 
 export const DEFAULT_TAGS = ['breakfast', 'lunch', 'dinner', 'snack', 'drink']
 export const EMOJI_PICKS = ['🥚', '🍗', '🥩', '🐟', '🥛', '🧀', '🍞', '🍚', '🍝', '🥗', '🍌', '🍎', '🥜', '🥤', '☕', '🍫']
@@ -11,6 +12,7 @@ const toText = (n) => (n === null || n === undefined ? '' : String(n))
 /** Add or edit a saved food. `food` = null → new. */
 export function FoodForm({ open, food, onClose }) {
   const { state, actions } = useStore()
+  const toast = useToast()
   const { trackCarbs, trackFat } = state.settings
   const [form, setForm] = useState({})
   const [errors, setErrors] = useState({})
@@ -74,7 +76,7 @@ export function FoodForm({ open, food, onClose }) {
               className="flex-1"
               confirmLabel={usedIn.length ? `Delete (and remove from ${usedIn.length} meal${usedIn.length > 1 ? 's' : ''})` : 'Tap again to delete'}
               onConfirm={() => {
-                actions.deleteFood(food.id)
+                toast(`Deleted ${food.name}`, { label: 'Undo', onClick: actions.deleteFood(food.id) })
                 onClose()
               }}
             >

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useStore } from '../state/store.jsx'
-import { Segmented, Button, EmptyState, TextInput, IconPlus, IconChevron } from './ui.jsx'
+import { Segmented, Button, EmptyState, TextInput, IconPlus, IconTrash } from './ui.jsx'
+import { useToast } from './Toast.jsx'
 import { FoodForm } from './FoodForm.jsx'
 import { MealForm } from './MealForm.jsx'
 import { fmt, indexById, mealNutrition, describeMeal } from '../lib/nutrition.js'
@@ -13,6 +14,18 @@ export function FoodsScreen({ intent, clearIntent }) {
   const [query, setQuery] = useState('')
   const [editingFood, setEditingFood] = useState(undefined) // undefined = closed, null = new
   const [editingMeal, setEditingMeal] = useState(undefined)
+  const toast = useToast()
+
+  // One tap deletes; the toast's Undo brings it back (including meal contents).
+  const removeFood = (f) => {
+    const inMeals = state.meals.filter((m) => m.items.some((it) => it.foodId === f.id)).length
+    const undo = actions.deleteFood(f.id)
+    toast(`Deleted ${f.name}${inMeals ? ` · removed from ${inMeals} meal${inMeals > 1 ? 's' : ''}` : ''}`, { label: 'Undo', onClick: undo })
+  }
+  const removeMeal = (m) => {
+    const undo = actions.deleteMeal(m.id)
+    toast(`Deleted ${m.name}`, { label: 'Undo', onClick: undo })
+  }
 
   // Deep link from other screens ("Add your first food").
   useEffect(() => {
@@ -75,10 +88,11 @@ export function FoodsScreen({ intent, clearIntent }) {
                   subtitle={[f.serving, f.tag].filter(Boolean).join(' · ')}
                   calories={f.calories}
                   protein={f.protein}
-                  extra={[trackCarbs && f.carbs != null ? `${fmt(f.carbs)}C` : null, trackFat && f.fat != null ? `${fmt(f.fat)}F` : null]
+                  extra={[trackCarbs && f.carbs != null ? `${fmt(f.carbs)}g carbs` : null, trackFat && f.fat != null ? `${fmt(f.fat)}g fat` : null]
                     .filter(Boolean)
                     .join(' ')}
                   onClick={() => setEditingFood(f)}
+                  onDelete={() => removeFood(f)}
                 />
               </li>
             ))}
@@ -118,6 +132,7 @@ export function FoodsScreen({ intent, clearIntent }) {
                   calories={n.calories}
                   protein={n.protein}
                   onClick={() => setEditingMeal(m)}
+                  onDelete={() => removeMeal(m)}
                 />
               </li>
             )
@@ -131,23 +146,35 @@ export function FoodsScreen({ intent, clearIntent }) {
   )
 }
 
-function Row({ emoji, title, subtitle, calories, protein, extra, onClick }) {
+function Row({ emoji, title, subtitle, calories, protein, extra, onClick, onDelete }) {
   return (
-    <button onClick={onClick} className="flex w-full items-center gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-3 text-left active:bg-sunken">
-      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-sunken text-xl" aria-hidden>
-        {emoji || '🍽️'}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block truncate font-semibold">{title}</span>
-        {subtitle && <span className="block truncate text-xs text-muted">{subtitle}</span>}
-      </span>
-      <span className="tabular shrink-0 text-right text-sm">
-        <span className="block font-semibold text-cal">{fmt(calories)} kcal</span>
-        <span className="block font-semibold text-pro">
-          {fmt(protein)} g P {extra && <span className="font-normal text-faint">· {extra}</span>}
+    <div className="flex items-stretch overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface">
+      <button onClick={onClick} className="flex min-w-0 flex-1 items-center gap-3 p-3 text-left active:bg-sunken" aria-label={`Edit ${title}`}>
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-sunken text-xl" aria-hidden>
+          {emoji || '🍽️'}
         </span>
-      </span>
-      <IconChevron size={18} className="shrink-0 text-faint" />
-    </button>
+        <span className="min-w-0 flex-1">
+          <span className="line-clamp-2 leading-snug font-semibold">{title}</span>
+          {(subtitle || extra) && (
+            <span className="block truncate text-xs text-muted">
+              {[subtitle, extra].filter(Boolean).join(' · ')}
+            </span>
+          )}
+        </span>
+        <span className="tabular shrink-0 text-right text-sm">
+          <span className="block font-semibold text-cal">{fmt(calories)} kcal</span>
+          <span className="block font-semibold text-pro">
+            {fmt(protein)} g P
+          </span>
+        </span>
+      </button>
+      <button
+        onClick={onDelete}
+        className="grid w-12 shrink-0 place-items-center border-l border-line text-faint active:bg-sunken active:text-ink"
+        aria-label={`Delete ${title}`}
+      >
+        <IconTrash size={18} />
+      </button>
+    </div>
   )
 }

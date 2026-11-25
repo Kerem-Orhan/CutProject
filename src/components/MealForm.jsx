@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Sheet, Button, ConfirmButton, Field, TextInput, IconMinus, IconPlus, IconX } from './ui.jsx'
 import { useStore } from '../state/store.jsx'
+import { useToast } from './Toast.jsx'
 import { fmt, formatServings, indexById, mealNutrition } from '../lib/nutrition.js'
 import { DEFAULT_TAGS } from './FoodForm.jsx'
 
@@ -9,6 +10,7 @@ const MEAL_EMOJI = ['🍳', '🥪', '🍱', '🍲', '🌯', '🥣', '🍽️', '
 /** Build a meal from saved foods. Totals are always live from the foods. */
 export function MealForm({ open, meal, onClose }) {
   const { state, actions } = useStore()
+  const toast = useToast()
   const [name, setName] = useState('')
   const [emoji, setEmoji] = useState('')
   const [tag, setTag] = useState('')
@@ -68,7 +70,7 @@ export function MealForm({ open, meal, onClose }) {
               <ConfirmButton
                 className="flex-1"
                 onConfirm={() => {
-                  actions.deleteMeal(meal.id)
+                  toast(`Deleted ${meal.name}`, { label: 'Undo', onClick: actions.deleteMeal(meal.id) })
                   onClose()
                 }}
               >

@@ -5,9 +5,11 @@ import { formatDayLabel } from '../lib/dates.js'
 import { sevenDayAverage } from '../lib/history.js'
 import { EntryList } from './EntryList.jsx'
 import { EmptyState, IconChevron } from './ui.jsx'
+import { useToast } from './Toast.jsx'
 
 export function HistoryScreen() {
-  const { state } = useStore()
+  const { state, actions } = useStore()
+  const toast = useToast()
   const todayKey = useTodayKey()
   const [open, setOpen] = useState(null)
   const { calorieGoal, proteinGoal, goalType, trackCarbs, trackFat } = state.settings
@@ -74,7 +76,15 @@ export function HistoryScreen() {
                 </button>
                 {isOpen && (
                   <div className="border-t border-line bg-bg p-3">
-                    <EntryList entries={d.entries} showMacros={trackCarbs || trackFat} />
+                    <EntryList
+                      entries={d.entries}
+                      showMacros={trackCarbs || trackFat}
+                      onRemove={(e) => {
+                        actions.removeEntries(d.date, [e.id])
+                        toast(`Removed ${e.snapshot.name}`, { label: 'Undo', onClick: () => actions.restoreEntries(d.date, [e]) })
+                      }}
+                      onServings={(e, servings) => actions.setServings(d.date, e.id, servings)}
+                    />
                   </div>
                 )}
               </li>

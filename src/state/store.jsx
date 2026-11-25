@@ -47,12 +47,25 @@ function reducer(state, action) {
         ),
       }
 
+    case 'food/restore':
+      // Undo for food/delete: put the food back and restore the meals it was in.
+      return {
+        ...state,
+        foods: state.foods.some((f) => f.id === action.food.id) ? state.foods : [...state.foods, action.food],
+        meals: state.meals.map((m) => {
+          const saved = action.meals.find((x) => x.id === m.id)
+          return saved ? { ...m, items: saved.items } : m
+        }),
+      }
+
     case 'meal/add':
       return { ...state, meals: [...state.meals, action.meal] }
     case 'meal/update':
       return { ...state, meals: state.meals.map((m) => (m.id === action.meal.id ? action.meal : m)) }
     case 'meal/delete':
       return { ...state, meals: state.meals.filter((m) => m.id !== action.id) }
+    case 'meal/restore':
+      return state.meals.some((m) => m.id === action.meal.id) ? state : { ...state, meals: [...state.meals, action.meal] }
 
     case 'log/items': {
       // action.items: [{ entryId, kind, id, servings }]; snapshots taken now,
@@ -96,6 +109,8 @@ const StoreContext = createContext(null)
 export function StoreProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, undefined, loadState)
   const skipNextSave = useRef(false)
+  const stateRef = useRef(state)
+  stateRef.current = state
 
   // Persist on every change.
   useEffect(() => {
@@ -130,11 +145,23 @@ export function StoreProvider({ children }) {
       },
       addFoods: (foods) => dispatch({ type: 'food/addMany', foods }),
       updateFood: (food) => dispatch({ type: 'food/update', food }),
-      deleteFood: (id) => dispatch({ type: 'food/delete', id }),
+      /** Deletes a food (and removes it from meals). Returns an undo function. */
+      deleteFood: (id) => {
+        const { foods, meals } = stateRef.current
+        const food = foods.find((f) => f.id === id)
+        const affected = meals.filter((m) => m.items.some((it) => it.foodId === id)).map((m) => ({ id: m.id, items: m.items }))
+        dispatch({ type: 'food/delete', id })
+        return () => food && dispatch({ type: 'food/restore', food, meals: affected })
+      },
 
       addMeal: (meal) => dispatch({ type: 'meal/add', meal: { ...meal, id: uid(), createdAt: Date.now() } }),
       updateMeal: (meal) => dispatch({ type: 'meal/update', meal }),
-      deleteMeal: (id) => dispatch({ type: 'meal/delete', id }),
+      /** Deletes a meal. Returns an undo function. */
+      deleteMeal: (id) => {
+        const meal = stateRef.current.meals.find((m) => m.id === id)
+        dispatch({ type: 'meal/delete', id })
+        return () => meal && dispatch({ type: 'meal/restore', meal })
+      },
 
       /** Log one or more saved items. Returns the new entry ids (for undo). */
       log: (items) => {
