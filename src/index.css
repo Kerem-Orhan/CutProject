@@ -1,0 +1,101 @@
+@import 'tailwindcss';
+
+/* Design tokens. Utilities like bg-surface / text-muted / text-cal read these,
+   and the dark-mode block below swaps the values, so components never need
+   dark: variants. */
+@theme {
+  --color-bg: #f6f5f2;
+  --color-surface: #ffffff;
+  --color-sunken: #efede8;
+  --color-ink: #1c1d1f;
+  --color-muted: #6b6f76;
+  --color-faint: #a3a6ab;
+  --color-line: #e6e3dc;
+
+  --color-cal: #2f7d6d;      /* calories */
+  --color-cal-soft: #dcefe9;
+  --color-pro: #4f5bd5;      /* protein */
+  --color-pro-soft: #e3e5fa;
+  --color-carb: #b67a1f;
+  --color-fat: #9a5f97;
+  --color-calm: #8a8f98;     /* over-goal: neutral, never alarming */
+  --color-calm-soft: #e9eaec;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --radius-card: 1.25rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #141517;
+    --color-surface: #1d1f22;
+    --color-sunken: #18191c;
+    --color-ink: #ececec;
+    --color-muted: #9aa0a8;
+    --color-faint: #686d74;
+    --color-line: #2c2f33;
+    --color-cal: #5cc2a9;
+    --color-cal-soft: #1f3631;
+    --color-pro: #8b95f2;
+    --color-pro-soft: #262a48;
+    --color-carb: #e0a64d;
+    --color-fat: #c98bc6;
+    --color-calm: #8f949b;
+    --color-calm-soft: #2a2c30;
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  @apply bg-bg text-ink font-sans antialiased;
+  overscroll-behavior-y: none;
+}
+
+/* Thumb-friendly defaults */
+button {
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+input, select, textarea {
+  font-size: 16px; /* prevents iOS zoom on focus */
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.94); }
+  100% { transform: scale(1); }
+}
+.animate-sheet { animation: sheet-up 220ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+.animate-fade { animation: fade-in 160ms ease-out; }
+.animate-pop { animation: pop 240ms ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-sheet, .animate-fade, .animate-pop { animation: none; }
+}
