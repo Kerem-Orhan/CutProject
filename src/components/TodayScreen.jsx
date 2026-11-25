@@ -35,16 +35,11 @@ export function TodayScreen({ goTo }) {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-end justify-between">
-        <div>
-          <p className="text-sm text-muted">
-            {parseDateKey(todayKey).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
-          </p>
-          <h1 className="text-3xl font-bold tracking-tight">Today</h1>
-        </div>
-        <span className="rounded-full bg-sunken px-3 py-1 text-xs font-semibold text-muted">
-          {cutting ? 'Staying under' : 'Reaching at least'}
-        </span>
+      <header>
+        <p className="text-sm text-muted">
+          {parseDateKey(todayKey).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+        </p>
+        <h1 className="text-3xl font-bold tracking-tight">Today</h1>
       </header>
 
       <section className="rounded-[var(--radius-card)] border border-line bg-surface p-4" aria-label="Today's progress">

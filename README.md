@@ -99,6 +99,10 @@ Deleting a food also removes it from any meal that contains it.
 - Items and combos are ranked by how close they land to the remaining calorie gap, with any protein shortfall weighed in on the same scale.
 - When the calorie target is reached, `status = 'met'`. If protein is still short, the most protein-dense items are listed.
 
+## Planned: sync between devices
+
+A sync code with Save/Load buttons is planned. See [docs/SYNC_PLAN.md](docs/SYNC_PLAN.md).
+
 ## Backups
 
 Settings → **Export JSON** downloads everything. **Import JSON** shows what the file contains and asks
